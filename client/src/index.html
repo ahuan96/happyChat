@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Happy Chat</title>
+  <style></style>
+  <link rel="stylesheet" href="./css/index.css" />
+  <link rel="stylesheet" href="./libs/rolling/css/rolling.css" />
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+  <script type="text/javascript" src="./libs/jquery-1.11.2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="./libs/socket.io.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/this.socket.io/2.3.0/this.socket.io.js"></script> -->
+</head>
+
+<body>
+  <div id="app">
+    <div id="content">
+      <template v-for="item in msgData">
+        <p v-if="item.type == 1">
+          <i>系统消息：</i><span>{{item.msg}}</span>
+        </p>
+        <p v-else><i>{{item.user}}：</i><span v-html="transEmoji(item.msg)"></span></p>
+      </template>
+    </div>
+    <div class="bot">
+      <div class="input-box">
+        <div class="emoji-box">
+          <el-popover placement="top" width="240" trigger="click" visible-arrow="true" popper-class="popper-emoji">
+            <div>
+              <template v-for="num in emojiData">
+                <img :src="'./images/face/'+num+'.gif'" @click="pushEmoji(num)" alt="">
+              </template>
+  
+            </div>
+            <i slot="reference" class="el-icon-s-opportunity tool-btn"></i>
+          </el-popover>
+        </div>
+
+        <textarea type="text" v-model="message" @focus="End($event)" @keyup.enter="say" :disabled="!socket"></textarea>
+        <button class="el-button el-button--primary el-button--large" type="button" @click="say">
+          <span>发送消息</span>
+        </button>
+      </div>
+      <div>
+        <i class="tool-btn el-icon-menu" @click="drawer = true"></i>
+      </div>
+    </div>
+
+    <el-drawer title="我是标题" :visible.sync="drawer" :with-header="false" custom-class="my-drawer">
+      <el-tabs v-model="activeName" @tab-click="handleClick">
+        <el-tab-pane label="用户管理" name="first">
+          <div style="text-align:center;">
+            <el-avatar size="large" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png">
+            </el-avatar>
+          </div>
+          <el-form ref="form" :model="form" label-width="40px">
+            <el-form-item label="名称">
+              <el-input v-model="form.name" placeholder="输入昵称"></el-input>
+            </el-form-item>
+            <div style="text-align: center;">
+              <button class="el-button el-button--primary el-button--large" type="button" @click="connect">
+                <span>连接</span>
+              </button>
+            </div>
+
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane label="配置管理" name="second">
+          <el-form ref="form" :model="form" label-width="40px">
+            <el-form-item label="主题">
+              <el-select v-model="form.backImg" placeholder="请选择" @change="setTheme">
+                <el-option v-for="item in themeData" :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="样式">
+              <el-select v-model="form.style" placeholder="请选择" @change="setTheme">
+                <el-option v-for="item in themeStyle" :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+      </el-tabs>
+
+    </el-drawer>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        host:'http://localhost:3000',
+        // host:'http://www.hh666.wang:3000',
+        message: '',
+        socket: '',
+        msgData: [],
+        emojiData: [],
+        drawer: true,
+        activeName: 'first',
+        themeData: [{ value: '12', label: '默认' }, { value: '1', label: '深林雪' }, { value: '2', label: '圣诞果' }, { value: '3', label: '绿意饼' }, { value: '4', label: '黄昏海' }, { value: '5', label: '赤焰红' }, { value: '6', label: '敦煌画' }, { value: '7', label: '可爱杯' }, { value: '8', label: '小甜心' }, { value: '9', label: '爱学习' }, { value: '10', label: '草麦地' }, { value: '11', label: '彩虹人' }],
+        themeStyle: [{ value: 'bg', label: '清晰' }, { value: 'mh', label: '模糊' }],
+        form: {
+          name: '',
+          backImg: '12',
+          style: 'mh'
+        }
+      },
+      mounted() {
+        for (let i = 1; i < 72; i++) {
+          this.emojiData.push(i)
+        }
+      },
+      methods: {
+        connect() {
+          let _this = this
+          let nickName = this.form.name
+          // 建立连接
+          if (!nickName) {
+            this.$message.error('请输入昵称，再进行连接^_^');
+            return
+          }
+          // 建立连接
+          if (this.socket) {
+            this.socket.close() // 断开连接
+          }
+
+          this.socket = io.connect(this.host)
+
+          // 设置昵称
+          this.socket.emit('setName', { nickName })
+          this.drawer = false
+
+          // 监听 message 会话
+          this.socket.on('system', function (data) {
+            data.type = 1
+            _this.msgData.push(data)
+            console.log(data)
+          })
+
+          this.socket.on('chat', function (data) {
+            _this.msgData.push(data)
+            _this.goBot()
+            console.log(data)
+          })
+        },
+        // 按钮点击事件
+        say() {
+          let _this = this
+          if (!this.socket) {
+            this.$message.error('请先进行连接');
+            this.drawer = true
+            return
+          }
+          let msg = _this.message
+          if (!msg) return
+          let html = document.createElement('p')
+          this.socket.emit('say', { msg })
+          _this.message = ''
+        },
+        // 滚动条滚到最下面
+        goBot() {
+          var scrollHeight = $('#content').prop('scrollHeight')
+          console.log(scrollHeight)
+
+          $('#content').animate(
+            {
+              scrollTop: scrollHeight,
+            },
+            500
+          )
+        },
+        transEmoji(str) {
+          str = str.replace(/\[em_([0-9]*)\]/g, '<img src="./images/face/$1.gif" alt="" />');
+          return str
+        },
+        pushEmoji(num) {
+          this.message = this.message + '[em_' + num + ']'
+        },
+        End(e) { //input获取光标显示在最后
+          let obj = e.srcElement;
+          obj.focus();
+          const len = obj.value.length;
+          //光标定位要加上 setTimeOut，不然就会重新光标定位失败
+          setTimeout(() => {
+            obj.selectionStart = obj.selectionEnd = len;
+          }, 60)
+        },
+        handleClick(tab, event) {
+          console.log(tab, event);
+        },
+        // 设置主题背景
+        setTheme() {
+          console.log('aaa')
+          document.querySelector('html').style.background = 'url(./images/theme/' + this.form.backImg + '_' + this.form.style + '.jpg) no-repeat fixed top';
+          document.querySelector('html').style.backgroundSize = 'cover';
+        }
+      },
+    })
+  </script>
+</body>
+
+</html>

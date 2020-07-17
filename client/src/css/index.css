@@ -1,0 +1,142 @@
+html,body,#content{
+  margin: 0;
+  height: 100%;
+}
+
+html{
+  background: url(../images/theme/12_mh.jpg) no-repeat fixed top;
+  /* background-repeat:no-repeat;
+  background-attachment:fixed;
+  background-position:top; */
+  background-size: cover;
+}
+
+#content{
+  overflow-y: auto;
+  height: calc(100% - 80px);
+}
+
+#content p {
+    background: #fff;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin: 5px;
+}
+
+#content i {
+  color: #00aac5;
+}
+
+ /* 滚动条框设置 */
+ textarea::-webkit-scrollbar {
+  width: 1px;
+  background-color: rgb(182, 214, 226);
+}
+
+/* 滚动条的设置 */
+textarea::-webkit-scrollbar-thumb {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+  background-color: skyblue;
+}
+
+.tool-btn{
+  font-size: 25px;
+  color: #fff;
+}
+.tool-btn:hover{
+  /* transform:rotate(360deg); */
+  transform:scale(1.2) ;
+  color: yellow;
+}
+.emoji-box{
+  margin-right: 10px;
+}
+.popper-emoji{
+  height: 120px;
+  overflow-y: auto;
+}
+.bot>div{
+  display: flex;
+  align-items: center;
+}
+textarea {
+    background-color: #fff;
+    background-image: none;
+    border-radius: 4px;
+    border: 1px solid #bfcbd9;
+    box-sizing: border-box;
+    color: #1f2d3d;
+    font-size: inherit;
+    height: 40px;
+    line-height: 1;
+    outline: 0;
+    padding: 3px 10px;
+    margin: 0 5px;
+    resize : none;
+    width: 260px;
+    font-size: 16px;
+  }
+  textarea:disabled{
+    background-color: #ccc;
+  }
+
+  input {
+    background-color: #fff;
+    background-image: none;
+    border-radius: 4px;
+    border: 1px solid #bfcbd9;
+    box-sizing: border-box;
+    color: #1f2d3d;
+    font-size: inherit;
+    height: 40px;
+    line-height: 1;
+    outline: 0;
+    padding: 3px 10px;
+  }
+
+  /* .el-button--primary {
+    color: #fff;
+    background-color: #20a0ff;
+    border-color: #20a0ff;
+  }
+  .bot .el-button {
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    background: #00aac5;
+    border: 1px solid #c4c4c4;
+    color: #fff;
+    margin: 0 5px;
+    padding: 10px 15px;
+    border-radius: 4px;
+    outline: 0;
+    text-align: center;
+  } */
+
+  .bot{
+    position: fixed;
+    bottom: 0px;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 30px;
+    background: url(../images/room_input_bg.png);
+  }
+
+.el-tabs__nav-scroll{
+  display: flex;
+    justify-content: center;
+}
+  .el-form{
+    padding: 10px;
+  }
+
+  .el-drawer.rtl.my-drawer{
+    border-radius: 10px 0px 0 10px;
+    margin: 10px 0;
+    height: calc(100% - 20px);
+    background: #f2f6fc;
+  }
