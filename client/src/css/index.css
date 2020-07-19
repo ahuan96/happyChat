@@ -140,3 +140,7 @@ textarea {
     height: calc(100% - 20px);
     background: #f2f6fc;
   }
+
+  .my_dialog .el-dialog__header{
+    display: none;
+  }

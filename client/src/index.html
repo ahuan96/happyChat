@@ -33,7 +33,7 @@
               <template v-for="num in emojiData">
                 <img :src="'./images/face/'+num+'.gif'" @click="pushEmoji(num)" alt="">
               </template>
-  
+
             </div>
             <i slot="reference" class="el-icon-s-opportunity tool-btn"></i>
           </el-popover>
@@ -82,24 +82,69 @@
                 </el-option>
               </el-select>
             </el-form-item>
+
           </el-form>
         </el-tab-pane>
       </el-tabs>
 
     </el-drawer>
+
+    <el-dialog :visible.sync="dialogVisible" width="400px" :title="1" :close-on-click-modal='false'
+      :close-on-press-escape='false' custom-class="my_dialog" :show-close='false'>
+      </span>
+
+      <el-tabs v-model="activeName" @tab-click="handleClick">
+        <el-tab-pane label="登录" name="first">
+          <el-form ref="form" :model="loginForm" label-width="80px">
+            <el-form-item label="用户名称">
+              <el-input v-model="loginForm.username"></el-input>
+            </el-form-item>
+            <el-form-item label="用户密码">
+              <el-input type="password" v-model="loginForm.password"></el-input>
+            </el-form-item>
+            <div style="text-align: center;">
+              <el-button type="primary" @click="toLogin">立即登录</el-button>
+            </div>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane label="注册" name="second">
+          <el-form ref="form" :model="loginForm" label-width="80px">
+            <el-form-item label="用户名称">
+              <el-input v-model="loginForm.username"></el-input>
+            </el-form-item>
+            <el-form-item label="用户密码">
+              <el-input type="password" v-model="loginForm.password"></el-input>
+            </el-form-item>
+            <div style="text-align: center;">
+              <el-button type="primary" @click="toSign">立即注册</el-button>
+            </div>
+          </el-form>
+        </el-tab-pane>
+      </el-tabs>
+
+    </el-dialog>
   </div>
 
   <script>
+    import { post, fetch, patch, put } from './utils/http'
+
+    //定义全局变量
+    Vue.prototype.$post = post;
+    Vue.prototype.$fetch = fetch;
+    Vue.prototype.$patch = patch;
+    Vue.prototype.$put = put;
+
     new Vue({
       el: '#app',
       data: {
-        host:'http://localhost:3000',
+        host: 'http://localhost:3000',
         // host:'http://www.hh666.wang:3000',
         message: '',
         socket: '',
         msgData: [],
         emojiData: [],
-        drawer: true,
+        drawer: false,
+        dialogVisible: true,
         activeName: 'first',
         themeData: [{ value: '12', label: '默认' }, { value: '1', label: '深林雪' }, { value: '2', label: '圣诞果' }, { value: '3', label: '绿意饼' }, { value: '4', label: '黄昏海' }, { value: '5', label: '赤焰红' }, { value: '6', label: '敦煌画' }, { value: '7', label: '可爱杯' }, { value: '8', label: '小甜心' }, { value: '9', label: '爱学习' }, { value: '10', label: '草麦地' }, { value: '11', label: '彩虹人' }],
         themeStyle: [{ value: 'bg', label: '清晰' }, { value: 'mh', label: '模糊' }],
@@ -107,7 +152,8 @@
           name: '',
           backImg: '12',
           style: 'mh'
-        }
+        },
+        loginForm: {}
       },
       mounted() {
         for (let i = 1; i < 72; i++) {
@@ -197,6 +243,16 @@
           console.log('aaa')
           document.querySelector('html').style.background = 'url(./images/theme/' + this.form.backImg + '_' + this.form.style + '.jpg) no-repeat fixed top';
           document.querySelector('html').style.backgroundSize = 'cover';
+        },
+        toLogin() {
+          //获取文章列表
+          var _this = this;
+          this.$post("/users/login",_this.loginForm).then(res => {
+            console.log(res);
+          });
+        },
+        toSign() {
+
         }
       },
     })
