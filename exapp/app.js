@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var toSocket = require('./utils/socket');
 
 var app = express();
 var server = http.createServer(app);
@@ -23,3 +24,5 @@ app.use(bodyParser.json())
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+// 建立socket监听
+toSocket(server)

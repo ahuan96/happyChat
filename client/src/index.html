@@ -6,13 +6,12 @@
   <title>Happy Chat</title>
   <style></style>
   <link rel="stylesheet" href="./css/index.css" />
-  <link rel="stylesheet" href="./libs/rolling/css/rolling.css" />
-  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
-  <script type="text/javascript" src="./libs/jquery-1.11.2.min.js"></script>
+  <link rel="stylesheet" href="./libs/element-ui/lib/theme-chalk/index.css" />
+
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
-  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <!-- <script src="./libs/vue@2.6.11"></script> -->
+  <script src="./libs/element-ui/lib/index.js"></script>
   <script src="./libs/socket.io.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/this.socket.io/2.3.0/this.socket.io.js"></script> -->
 </head>
 
 <body>
@@ -58,26 +57,26 @@
           </div>
           <el-form ref="form" :model="form" label-width="40px">
             <el-form-item label="名称">
-              <el-input v-model="form.name" placeholder="输入昵称"></el-input>
+              <el-input v-model="form.username" disabled placeholder="输入昵称"></el-input>
             </el-form-item>
-            <div style="text-align: center;">
+            <!-- <div style="text-align: center;">
               <button class="el-button el-button--primary el-button--large" type="button" @click="connect">
                 <span>连接</span>
               </button>
-            </div>
+            </div> -->
 
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="配置管理" name="second">
           <el-form ref="form" :model="form" label-width="40px">
             <el-form-item label="主题">
-              <el-select v-model="form.backImg" placeholder="请选择" @change="setTheme">
+              <el-select v-model="form.theme_img" placeholder="请选择" @change="setTheme">
                 <el-option v-for="item in themeData" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="样式">
-              <el-select v-model="form.style" placeholder="请选择" @change="setTheme">
+              <el-select v-model="form.theme_style" placeholder="请选择" @change="setTheme">
                 <el-option v-for="item in themeStyle" :key="item.value" :label="item.label" :value="item.value">
                 </el-option>
               </el-select>
@@ -108,12 +107,12 @@
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="注册" name="second">
-          <el-form ref="form" :model="loginForm" label-width="80px">
+          <el-form ref="form" :model="signForm" label-width="80px">
             <el-form-item label="用户名称">
-              <el-input v-model="loginForm.username"></el-input>
+              <el-input v-model="signForm.username"></el-input>
             </el-form-item>
             <el-form-item label="用户密码">
-              <el-input type="password" v-model="loginForm.password"></el-input>
+              <el-input type="password" v-model="signForm.password"></el-input>
             </el-form-item>
             <div style="text-align: center;">
               <el-button type="primary" @click="toSign">立即注册</el-button>
@@ -126,13 +125,17 @@
   </div>
 
   <script>
+    // import Vue from 'vue';
+    
     import { post, fetch, patch, put } from './utils/http'
+    import $ from 'jquery'
 
     //定义全局变量
     Vue.prototype.$post = post;
     Vue.prototype.$fetch = fetch;
     Vue.prototype.$patch = patch;
     Vue.prototype.$put = put;
+
 
     new Vue({
       el: '#app',
@@ -149,11 +152,12 @@
         themeData: [{ value: '12', label: '默认' }, { value: '1', label: '深林雪' }, { value: '2', label: '圣诞果' }, { value: '3', label: '绿意饼' }, { value: '4', label: '黄昏海' }, { value: '5', label: '赤焰红' }, { value: '6', label: '敦煌画' }, { value: '7', label: '可爱杯' }, { value: '8', label: '小甜心' }, { value: '9', label: '爱学习' }, { value: '10', label: '草麦地' }, { value: '11', label: '彩虹人' }],
         themeStyle: [{ value: 'bg', label: '清晰' }, { value: 'mh', label: '模糊' }],
         form: {
-          name: '',
-          backImg: '12',
-          style: 'mh'
+          // name: '',
+          // backImg: '12',
+          // style: 'mh'
         },
-        loginForm: {}
+        loginForm: {},
+        signForm: {}
       },
       mounted() {
         for (let i = 1; i < 72; i++) {
@@ -163,7 +167,7 @@
       methods: {
         connect() {
           let _this = this
-          let nickName = this.form.name
+          let nickName = this.form.username
           // 建立连接
           if (!nickName) {
             this.$message.error('请输入昵称，再进行连接^_^');
@@ -241,17 +245,36 @@
         // 设置主题背景
         setTheme() {
           console.log('aaa')
-          document.querySelector('html').style.background = 'url(./images/theme/' + this.form.backImg + '_' + this.form.style + '.jpg) no-repeat fixed top';
+          document.querySelector('html').style.background = 'url(./images/theme/' + this.form.theme_img + '_' + this.form.theme_style + '.jpg) no-repeat fixed top';
           document.querySelector('html').style.backgroundSize = 'cover';
         },
         toLogin() {
-          //获取文章列表
           var _this = this;
           this.$post("/users/login",_this.loginForm).then(res => {
             console.log(res);
+            if(res.status == 200){
+              _this.$message.success(res.msg)
+              _this.form = res.data[0]
+              _this.dialogVisible = false
+              _this.connect()
+            }else{
+              _this.$message.error(res.msg)
+            }
           });
         },
         toSign() {
+          var _this = this;
+          this.$post("/users/sign",_this.signForm).then(res => {
+            console.log(res);
+            if(res.status == 200){
+              _this.$message.success(res.msg)
+              _this.form = res.data[0]
+              _this.dialogVisible = false
+              _this.connect()
+            }else{
+              _this.$message.error(res.msg)
+            }
+          });
 
         }
       },

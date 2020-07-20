@@ -10,9 +10,6 @@ getAllUsers = async (req,res) => {
 }
 
 login = async (req, res, next) => {
-    console.log(0,req.body)
-    console.log(1,req.body.username)
-    console.log(2,req.body.password)
     let {username,password} = req.body
 
     let sql = 'select * from users where username = ? and password = ?'
@@ -24,7 +21,7 @@ login = async (req, res, next) => {
 
 selByName = async (req, res, next) => {
 
-    let {username} = req.query
+    let {username} = req.body
 
     let sql = 'select * from users where username = ?'
     let sqlArr = [username]
@@ -45,10 +42,12 @@ selById = async (req, res, next) => {
 }
 
 addUser = async (req, res, next) => {
+    console.log(2,req.body)
+    let {username,password} = req.body
+    console.log(3,username)
+    console.log(4,password)
 
-    let {username,password} = req.query
-
-    let sql = 'insert into users (username,password) VALUES(?,?)'
+    let sql = 'insert into users (username,password) VALUES (?,?)'
     let sqlArr = [username,password]
 
     let data = await dbConfig.sqlConnect(sql, sqlArr)

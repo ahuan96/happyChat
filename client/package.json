@@ -1,7 +1,7 @@
 {
-  "name": "elec1",
-  "productName": "elec1",
-  "version": "1.0.0",
+  "name": "happyChat",
+  "productName": "happyChat",
+  "version": "3.0.0",
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
@@ -33,7 +33,7 @@
         "icon": "src/images/app_logo"
       },
       "electronWinstallerConfig": {
-        "name": "elec1"
+        "name": "happyChat"
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
@@ -43,14 +43,17 @@
       },
       "windowsStoreConfig": {
         "packageName": "",
-        "name": "elec1"
+        "name": "happyChat"
       }
     }
   },
   "dependencies": {
     "axios": "^0.19.2",
     "electron-compile": "^6.4.4",
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "element-ui": "^2.13.2",
+    "jquery": "^3.5.1",
+    "vue": "^2.6.11"
   },
   "devDependencies": {
     "babel-plugin-transform-async-to-generator": "^6.24.1",

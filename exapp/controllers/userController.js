@@ -33,6 +33,7 @@ selUser = (req, res, next) => {
 
 // 用户登录
 login = async (req, res, next) => {
+    console.log('login',req.body)
     let data = await userModel.login(req, res)
 
     if (data && data.length === 1){
