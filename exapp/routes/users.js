@@ -9,5 +9,6 @@ router.get('/getUsers', user.getUsers );
 router.get('/selUser', user.selUser );
 router.post('/login', user.login );
 router.post('/sign', user.sign );
+router.get('/updateUser', user.updateUser );
 
 module.exports = router;

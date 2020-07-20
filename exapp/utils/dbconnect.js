@@ -1,14 +1,8 @@
 const mysql = require('mysql');
+const Config = require('./config')
 
 module.exports = {
-    config: {
-        // host : 'localhost',
-        host: '47.95.207.130',
-        port: '3306',
-        user: 'root',
-        password: '123456',
-        database: 'test'
-    },
+    config: Config.DB_config,
     sqlConnect(sql, sqlArr) {
         return new Promise((resolve, reject) => {
             // 创建连接池

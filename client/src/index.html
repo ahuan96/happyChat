@@ -52,12 +52,20 @@
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="用户管理" name="first">
           <div style="text-align:center;">
-            <el-avatar size="large" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png">
-            </el-avatar>
+            <el-upload class="avatar-uploader" action="http://localhost:3000/upload/profile" :accept="'image/*'"
+              :show-file-list="false" :on-success="handleAvatarSuccess" name='avatar'>
+              <el-avatar v-if="form.head_img" size="large" :src="form.head_img"></el-avatar>
+                <el-avatar v-else size="large" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png">
+              </el-avatar>
+            </el-upload>
+
           </div>
           <el-form ref="form" :model="form" label-width="40px">
             <el-form-item label="名称">
               <el-input v-model="form.username" disabled placeholder="输入昵称"></el-input>
+            </el-form-item>
+            <el-form-item label="简介">
+              <el-input v-model="form.desc" @blur="updateDesc" type="textarea" :autosize="{ minRows: 4, maxRows: 4 }" placeholder="说点什么"></el-input>
             </el-form-item>
             <!-- <div style="text-align: center;">
               <button class="el-button el-button--primary el-button--large" type="button" @click="connect">
@@ -126,7 +134,7 @@
 
   <script>
     // import Vue from 'vue';
-    
+
     import { post, fetch, patch, put } from './utils/http'
     import $ from 'jquery'
 
@@ -250,32 +258,63 @@
         },
         toLogin() {
           var _this = this;
-          this.$post("/users/login",_this.loginForm).then(res => {
+          this.$post("/users/login", _this.loginForm).then(res => {
             console.log(res);
-            if(res.status == 200){
+            if (res.status == 200) {
               _this.$message.success(res.msg)
               _this.form = res.data[0]
               _this.dialogVisible = false
               _this.connect()
-            }else{
+            } else {
               _this.$message.error(res.msg)
             }
           });
         },
         toSign() {
           var _this = this;
-          this.$post("/users/sign",_this.signForm).then(res => {
+          this.$post("/users/sign", _this.signForm).then(res => {
             console.log(res);
-            if(res.status == 200){
+            if (res.status == 200) {
               _this.$message.success(res.msg)
               _this.form = res.data[0]
               _this.dialogVisible = false
               _this.connect()
-            }else{
+            } else {
               _this.$message.error(res.msg)
             }
           });
 
+        },
+        // 图片上传成功
+        handleAvatarSuccess(res, file, fileList) {
+          if(res.status == 200){
+            // 更新个人信息
+            this.updateUser({
+              user_id:this.form.user_id,
+              head_img:res.filepath
+            })
+          }
+        },
+        updateUser(data){
+          var _this = this;
+          this.$fetch("/users/updateUser",data).then(res => {
+            console.log(res);
+            if (res.status == 200) {
+              _this.$message.success(res.msg)
+              _this.form.head_img = data.head_img
+              
+            } else {
+              _this.$message.error(res.msg)
+            }
+          });
+
+        },
+        updateDesc(){
+           // 更新个人信息
+           this.updateUser({
+              user_id:this.form.user_id,
+              desc:this.form.desc
+            })
         }
       },
     })

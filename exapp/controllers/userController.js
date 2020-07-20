@@ -1,5 +1,5 @@
 
-var dbConfig = require('../utils/dbconfig')
+var dbConnect = require('../utils/dbconnect')
 const { response } = require('express')
 var userModel = require('../models/userModel')
 
@@ -28,7 +28,7 @@ selUser = (req, res, next) => {
             })
         }
     }
-    dbConfig.sqlConnect(sql, sqlArr, callBack)
+    dbConnect.sqlConnect(sql, sqlArr, callBack)
 }
 
 // 用户登录
@@ -78,9 +78,29 @@ sign = async (req, res, next)=>{
     }
 }
 
+// 用户登录
+updateUser = async (req, res, next) => {
+    console.log('login',req.body)
+    let data = await userModel.updateUser(req, res)
+
+    if (data && data.affectedRows == 1){
+        res.send({
+            status:200,
+            msg:'修改成功'
+        })
+    }else{
+        res.send({
+            status:400,
+            msg:'修改失败'
+        })
+    }
+}
+
 module.exports = {
     getUsers,
     selUser,
     login,
-    sign
+    sign,
+    updateUser
+    
 }

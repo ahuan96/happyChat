@@ -1,11 +1,11 @@
-var dbConfig = require('../utils/dbconfig');
+var dbConnect = require('../utils/dbconnect');
 var tools = require('../utils/tools');
 
 
 getAllUsers = async (req,res) => {
     var sql = 'select * from users'
     var sqlArr = []
-    let data = await dbConfig.sqlConnect(sql, sqlArr)
+    let data = await dbConnect.sqlConnect(sql, sqlArr)
     return data
 }
 
@@ -15,7 +15,7 @@ login = async (req, res, next) => {
     let sql = 'select * from users where username = ? and password = ?'
     let sqlArr = [username,password]
 
-    let data = await dbConfig.sqlConnect(sql, sqlArr)
+    let data = await dbConnect.sqlConnect(sql, sqlArr)
     return data
 }
 
@@ -26,7 +26,7 @@ selByName = async (req, res, next) => {
     let sql = 'select * from users where username = ?'
     let sqlArr = [username]
 
-    let data = await dbConfig.sqlConnect(sql, sqlArr)
+    let data = await dbConnect.sqlConnect(sql, sqlArr)
     return data
 }
 
@@ -37,7 +37,7 @@ selById = async (req, res, next) => {
     let sql = 'select * from users where user_id = ?'
     let sqlArr = [user_id]
 
-    let data = await dbConfig.sqlConnect(sql, sqlArr)
+    let data = await dbConnect.sqlConnect(sql, sqlArr)
     return data
 }
 
@@ -50,7 +50,7 @@ addUser = async (req, res, next) => {
     let sql = 'insert into users (username,password) VALUES (?,?)'
     let sqlArr = [username,password]
 
-    let data = await dbConfig.sqlConnect(sql, sqlArr)
+    let data = await dbConnect.sqlConnect(sql, sqlArr)
     console.log(111)
     console.log(data)
     return data
@@ -58,12 +58,14 @@ addUser = async (req, res, next) => {
 
 updateUser = async (req, res, next) => {
 
-    let {username,password} = req.query
+    let user_id = req.query.user_id
+    delete req.query.user_id
+    let str = tools.toSqlString(req.query)
+    let sql = 'UPDATE users SET ' +str+ ' WHERE user_id = ' + user_id
+    console.log('sql',sql)
+    let sqlArr = []
 
-    let sql = 'insert into users (username,password) VALUES(?,?)'
-    let sqlArr = [username,password]
-
-    let data = await dbConfig.sqlConnect(sql, sqlArr)
+    let data = await dbConnect.sqlConnect(sql, sqlArr)
     console.log(111)
     console.log(data)
     return data
@@ -75,5 +77,6 @@ module.exports = {
     login,
     selByName,
     addUser,
-    selById
+    selById,
+    updateUser
 }
