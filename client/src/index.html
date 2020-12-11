@@ -292,17 +292,19 @@
             this.updateUser({
               user_id:this.form.user_id,
               head_img:res.filepath
-            })
+            },1)
           }
         },
-        updateUser(data){
+        updateUser(data,type){
           var _this = this;
           this.$fetch("/users/updateUser",data).then(res => {
             console.log(res);
             if (res.status == 200) {
               _this.$message.success(res.msg)
-              _this.form.head_img = data.head_img
-              
+              if( type ==1 ){
+                console.log(type)
+                _this.form.head_img = data.head_img
+              }
             } else {
               _this.$message.error(res.msg)
             }
